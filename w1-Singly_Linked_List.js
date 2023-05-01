@@ -140,5 +140,6 @@ const list = new SinglyLinkedList()
 list.insertAtBackRecursive(1)
 list.insertAtBackRecursive(2)
 list.insertAtBackRecursive(3)
+list.insertAtBackMany([1,2,3])
 
 console.log(list.toArr())
