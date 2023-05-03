@@ -42,60 +42,148 @@ class SinglyLinkedList {
     }
 
     /**
-     * Creates a new node with the given data and inserts that node at the front
-     * of this list.
-     * - Time: (?).
-     * - Space: (?).
-     * @param {any} data The data for the new node.
-     * @returns {SinglyLinkedList} This list.
+     * Removes the last node of this list.
+     * - Time: O(?).
+     * - Space: O(?).
+     * @returns {any} The data from the node that was removed.
      */
-    insertAtFront(data) {
-        if (this.isEmpty()) {
-            this.head = new ListNode(data)
+    removeBack() {
+        if (!this.isEmpty()) {
+            if (this.head.next === null){
+                let dataRemoved = this.head.data
+                this.head=null
+                return dataRemoved
+            }
+            let runner = this.head
+            while (runner.next.next !== null) {
+                runner = runner.next
+            }
+            let dataRemoved = runner.next.data
+            runner.next = null
+            return dataRemoved
         }
-        else {
-            let temp = this.head
-            this.head = new ListNode(data)
-            this.head.next = temp
+    }
+
+    // Alternate Method:
+    // removeBack() {
+    //     let [runner1, runner2] = [this.head, this.head];
+    //     while (runner1.next !== null) {
+    //         runner2 = runner1;
+    //         runner1 = runner1.next;
+    //     }
+    //     runner2.next = null;
+    //     return runner1.data
+    // }
+
+    /**
+     * Determines whether or not the given search value exists in this list.
+     * - Time: O(?).
+     * - Space: O(?).
+     * @param {any} val The data to search for in the nodes of this list.
+     * @returns {boolean}
+     */
+    contains(val) {
+        let runner = this.head;
+        while (runner !== null) {
+            if (runner.data == val) {
+                return true
+            }
+            runner = runner.next;
         }
-        return this
+        return false
     }
 
     /**
-     * Removes the first node of this list.
-     * - Time: (?).
-     * - Space: (?).
-     * @returns {any} The data from the removed node.
+     * Determines whether or not the given search value exists in this list.
+     * - Time: O(?).
+     * - Space: O(?).
+     * @param {any} val The data to search for in the nodes of this list.
+     * @param {?ListNode} current The current node during the traversal of this list
+     *    or null when the end of the list has been reached.
+     * @returns {boolean}
      */
-    removeHead() {
-        let removedData = this.head.data
-        if (!this.isEmpty()) {
-            this.head = this.head.next
-            return removedData
+    containsRecursive(val, current = this.head) {
+        if (current === null) {
+            return false
         }
+        if (current.data === val) {
+            return true
+        }
+        return this.containsRecursive(val, current.next)
     }
 
     // EXTRA
     /**
+     * Recursively finds the maximum integer data of the nodes in this list.
+     * - Time: O(?).
+     * - Space: O(?).
+     * @param {ListNode} runner The start or current node during traversal, or null
+     *    when the end of the list is reached.
+     * @param {ListNode} maxNode Keeps track of the node that contains the current
+     *    max integer as it's data.
+     * @returns {?number} The max int or null if none.
+     */
+    recursiveMax(runner = this.head, maxNode = this.head) { }
+
+    /**
+   * Creates a new node with the given data and inserts that node at the front
+   * of the list.
+   * - Time: O(1) constant.
+   * - Space: O(1) constant.
+   * @param {any} data The data for the new node.
+   * @returns {SinglyLinkedList} This list.
+   */
+    insertAtFront(data) {
+        const newHead = new ListNode(data);
+        newHead.next = this.head;
+        this.head = newHead;
+        return this;
+    }
+
+    /**
+     * Removes the first node of this list.
+     * - Time: O(1) constant.
+     * - Space: O(1) constant.
+     * @returns {any} The data from the removed node.
+     */
+    removeHead() {
+        if (this.isEmpty()) {
+            return null;
+        }
+
+        const oldHead = this.head;
+        this.head = oldHead.next;
+        return oldHead.data;
+    }
+
+    /**
      * Calculates the average of this list.
-     * - Time: (?).
-     * - Space: (?).
+     * - Time: O(n) linear, n = length of list.
+     * - Space: O(1) constant.
      * @returns {number|NaN} The average of the node's data.
      */
     average() {
-        if (this.isEmpty()) {
-            return "No Listnodes"
+        let runner = this.head;
+        let sum = 0;
+        let cnt = 0;
+
+        while (runner) {
+            cnt++;
+            sum += runner.data;
+            runner = runner.next;
         }
-        let runner = this.head
-        let sum = 0
-        let count = 0
-        while (runner !== null) {
-            sum += runner.data
-            count++
-            runner = runner.next
-        }
-        return sum / count
+
+        /**
+         * Dividing by 0 will give you NaN (Not a Number), so an empty list
+         * will return NaN in this case, it may make sense to allow NaN to be
+         * returned, because the average of an empty list doesn't make sense and
+         * it could be misleading to return 0 since 0 is the average of any
+         * list with a sum of 0 (due to negatives or all zeros).
+         */
+        return sum / cnt;
     }
+
+
 
     /**
    * Determines if this list is empty.
@@ -187,17 +275,14 @@ class SinglyLinkedList {
         return arr;
     }
 }
-
 const list = new SinglyLinkedList()
-
 list.insertAtFront(1)
-list.insertAtFront(2)
-list.insertAtFront(3)
-list.insertAtFront(4)
-list.insertAtFront(5)
+// list.insertAtFront(2)
+// list.insertAtFront(3)
+// list.insertAtFront(4)
+// list.insertAtFront(5)
 
 console.log(list.toArr())
 
-console.log(list.removeHead())
+console.log(list.removeBack())
 console.log(list.toArr())
-console.log(list.average());
