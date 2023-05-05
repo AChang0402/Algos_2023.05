@@ -42,36 +42,102 @@ class SinglyLinkedList {
     }
 
     /**
-     * Retrieves the data of the second to last node in this list.
+     * Concatenates the nodes of a given list onto the back of this list.
      * - Time: O(?).
      * - Space: O(?).
+     * @param {SinglyLinkedList} addList An instance of a different list whose
+     *    whose nodes will be added to the back of this list.
+     * @returns {SinglyLinkedList} This list with the added nodes.
+     */
+    concat(addList) {
+        const newBack = addList.head;
+        if (this.isEmpty()) {
+            this.head = newBack;
+            return this;
+        }
+        let runner = this.head;
+        while (runner.next !== null) {
+            runner = runner.next;
+        }
+        runner.next = newBack;
+        return this;
+    }
+
+    /**
+     * Finds the node with the smallest data and moves that node to the front of
+     * this list.
+     * - Time: O(?).
+     * - Space: O(?).
+     * @returns {SinglyLinkedList} This list.
+     */
+    // moveMinToFront() {
+    //     let minValue = this.recursiveMin()
+    //     if (minValue == null) {
+    //         return this
+    //     }
+    //     this.removeVal(minValue)
+    //     this.insertAtFront(minValue)
+    //     return this
+    // }
+
+    moveMinToFront() {
+        let minValue = this.recursiveMin()
+        if (minValue == null) {
+            return this
+        }
+        let runner = this.head
+        while (runner.next != null) {
+            if (runner.next.data === minValue) {
+                let minNode = runner.next
+                runner.next = runner.next.next
+                minNode.next = this.head;
+                this.head = minNode;
+                return this
+            }
+            runner = runner.next
+        }
+    }
+
+    // EXTRA
+    /**
+     * Splits this list into two lists where the 2nd list starts with the node
+     * that has the given value.
+     * splitOnVal(5) for the list (1=>3=>5=>2=>4) will change list to (1=>3)
+     * and the return value will be a new list containing (5=>2=>4)
+     * - Time: O(?).
+     * - Space: O(?).
+     * @param {any} val The value in the node that the list should be split on.
+     * @returns {SinglyLinkedList} The split list containing the nodes that are
+     *    no longer in this list.
+     */
+    splitOnVal(val) { }
+
+    /**
+     * Retrieves the data of the second to last node in this list.
+     * - Time: O(n - 1) n = list length -> O(n) linear.
+     * - Space: O(1) constant.
      * @returns {any} The data of the second to last node or null if there is no
      *    second to last node.
      */
     secondToLast() {
-        if (this.isEmpty()) {
+        if (!this.head || !this.head.next) {
             return null;
         }
 
-        // Only 1 node.
-        if (this.head.next === null) {
-            return null
-        }
-
-        // More than 1 node.
+        // There are at least 2 nodes since the above return hasn't happened.
         let runner = this.head;
 
         while (runner.next.next) {
             runner = runner.next;
         }
-
         return runner.data;
     }
 
     /**
-     * Removes the node that has the matching given val as it's data.
-     * - Time: O(?).
-     * - Space: O(?).
+     * Removes the node that has the given val.
+     * - Time: O(n) linear, n = list length since the last node could be the one
+     *    that is removed.
+     * - Space: O(1) constant.
      * @param {any} val The value to compare to the node's data to find the
      *    node to be removed.
      * @returns {boolean} Indicates if a node was removed or not.
@@ -81,39 +147,61 @@ class SinglyLinkedList {
             return false;
         }
 
-        // if first node data matches val
         if (this.head.data === val) {
-            this.head = this.head.next
+            this.removeHead();
             return true;
-        } // if only one unmatching node
-        else if (this.head.next==null) {
-            return false;
         }
 
-        let runner = this.head
-        while (runner.next.data !== val) {
-            if (runner.next.next == null) {
-                return false;
+        let runner = this.head;
+
+        while (runner.next) {
+            if (runner.next.data === val) {
+                runner.next = runner.next.next;
+                return true;
             }
-            else {
-                runner = runner.next
-            }
+            runner = runner.next;
         }
-        runner.next = runner.next.next;
-        return true;
+        return false;
     }
 
-    // EXTRA
     /**
-     * Inserts a new node before a node that has the given value as its data.
-     * - Time: O(?).
-     * - Space: O(?).
+     * Inserts a new node before a node with that has a specified value.
+     * - Time: O(n) linear, n = list length, because we could end up pre-pending
+     *    to the last node.
+     * - Space: O(1) constant.
      * @param {any} newVal The value to use for the new node that is being added.
      * @param {any} targetVal The value to use to find the node that the newVal
      *    should be inserted in front of.
-     * @returns {boolean} To indicate whether the node was pre-pended or not.
+     * @returns {ListNode|null} The added node, or null.
      */
-    prepend(newVal, targetVal) { }
+    prepend(newVal, targetVal) {
+        if (this.isEmpty()) {
+            return null;
+        }
+
+        if (this.head.data === targetVal) {
+            this.insertAtFront(newVal);
+            return this.head;
+        }
+
+        // we already know we're not going to need to prepend before the head
+        let runner = this.head;
+
+        while (runner) {
+            // End of list and not found.
+            if (runner.next === null) {
+                return null;
+            }
+
+            if (runner.next.data === targetVal) {
+                const prependNode = new ListNode(newVal);
+                prependNode.next = runner.next;
+                runner.next = prependNode;
+                return prependNode;
+            }
+            runner = runner.next;
+        }
+    }
 
     /**
    * Removes the last node of this list.
@@ -236,6 +324,22 @@ class SinglyLinkedList {
         }
 
         return this.recursiveMax(runner.next, maxNode);
+    }
+
+    recursiveMin(runner = this.head, minNode = this.head) {
+        if (this.head === null) {
+            return null;
+        }
+
+        if (runner === null) {
+            return minNode.data;
+        }
+
+        if (runner.data < minNode.data) {
+            minNode = runner;
+        }
+
+        return this.recursiveMin(runner.next, minNode);
     }
 
     /**
@@ -389,15 +493,22 @@ class SinglyLinkedList {
     }
 }
 
-
 const list = new SinglyLinkedList()
-list.insertAtFront(1)
+list.insertAtFront(5)
 list.insertAtFront(2)
 list.insertAtFront(3)
 list.insertAtFront(4)
-list.insertAtFront(5)
+list.insertAtFront(1)
 
+const list2 = new SinglyLinkedList()
+list2.insertAtFront(1)
+list2.insertAtFront(2)
+list2.insertAtFront(3)
+list2.insertAtFront(4)
+list2.insertAtFront(5)
+
+list.moveMinToFront()
 console.log(list.toArr())
 
-console.log(list.removeVal(1))
-console.log(list.toArr())
+// console.log(list.removeVal(1))
+// console.log(list.toArr())
