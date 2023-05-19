@@ -49,8 +49,6 @@ class SinglyLinkedList {
      */
     reverse() { }
 
-    }
-
     /**
      * Determines whether the list has a loop in it which would result in
      * infinitely traversing unless otherwise avoided. A loop is when a node's
