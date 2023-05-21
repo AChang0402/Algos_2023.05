@@ -47,7 +47,18 @@ class SinglyLinkedList {
      * - Space: (?).
      * @returns {SinglyLinkedList} This list.
      */
-    reverse() { }
+    reverse() {
+        let prevNode = null;
+        let runner = this.head;
+        while (runner !== null) {
+            let nextNode = runner.next;
+            runner.next = prevNode;
+            prevNode = runner;
+            runner = nextNode;
+        }
+        this.head = prevNode;
+        return this;
+    }
 
     /**
      * Determines whether the list has a loop in it which would result in
@@ -57,7 +68,28 @@ class SinglyLinkedList {
      * - Space: (?).
      * @returns {boolean} Whether the list has a loop or not.
      */
-    hasLoop() { }
+    hasLoop() {
+        let mem = {};
+        let runner = this.head;
+        while (runner !== null) {
+            // console.log(runner);
+            // console.log(mem);
+            if (!mem.hasOwnProperty(runner.data)) {
+                mem[runner.data] = [runner];
+            }
+            else {
+                for (const obj of mem[runner.data]) {
+                    if (runner === obj) {
+                        return true;
+
+                    }
+                }
+                mem[runner.data].push(runner)
+            }
+            runner = runner.next;
+        }
+        return false;
+    }
 
     /**
    * Concatenates the nodes of a given list onto the back of this list.
